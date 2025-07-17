@@ -51,3 +51,81 @@ because in SQLite, if a column is defined as `INTEGER`
 and `PRIMARY KEY`, there is no need to 
 define it as `AUTO_INCREMENT`.
 
+
+### The Application
+
+All code committed at each chapter is available with the commit message of the chapter name.
+
+#### Chapter 1: Setting up the routes
+
+Python libraries added:
+
+    fastapi
+    uvicorn
+
+We set up the project structure as follows:
+
+    assets           -> contains the application's assets
+    app              
+    |_ main.py       -> the main module for the application
+    |_ controllers   -> modules to handle application logic
+    |_ routers       -> modules to handle application requests
+
+The module `main.py` contains code to dispatch the requests to the application, to the classes 
+in `routers`:
+
+    ...
+    from routers import constellations, galaxies, stars, users
+    
+    app = FastAPI()
+    
+    app.include_router(constellations.router)
+    app.include_router(galaxies.router)
+    app.include_router(stars.router)
+    app.include_router(users.router)
+    ...
+
+A sample module in the `routers` package is `users.py`.  It contains the functions to 
+handle the requests to the `/users` endpoints:
+
+    ...
+    from app.controllers import users
+    
+    
+    router = APIRouter(
+        prefix="/users",
+        tags=["users"],
+    )
+    
+    
+    @router.post("/", status_code=status.HTTP_201_CREATED)
+    async def register_user() -> dict[str, str]:
+        """Handle POST method."""
+        return users.handle_post()
+    
+    
+    @router.get("/", status_code=status.HTTP_200_OK)
+    async def list_users() -> dict[str, str]:
+        """Handle GET method."""
+        return users.handle_list()
+    ...
+
+The different requests are then forwarded to different functions in `users.py` in the `controllers` package.
+
+    ...
+    def handle_post() -> dict[str, str]:
+        """Handle the POST request."""
+        return {
+            "message": "User successfully registered."
+        }
+
+
+    def handle_list() -> dict[str, str]:
+        """Handle the GET request."""
+        return {
+            "input": "ALL",
+            "message": "Users successfully retrieved."
+        } 
+    ...
+
+The other modules in the `routers` package follow a similar logic.
