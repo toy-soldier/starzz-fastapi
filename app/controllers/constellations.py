@@ -1,37 +1,31 @@
 """This module defines the functions called when the *_constellation* routes are invoked."""
+from sqlmodel import Session
+
+from app.models import orm_classes, crud_and_listing
+from app.schemas import constellations as c
 
 
-def handle_post() -> dict[str, str]:
+def handle_post(session: Session, data: c.ConstellationsForCreate) -> orm_classes.Constellations:
     """Handle the POST request."""
-    return {
-        "message": "Constellation successfully registered."
-    }
+    return crud_and_listing.create(orm_classes.Constellations, session, data)
 
 
-def handle_get(constellation_id: int) -> dict[str, str | int]:
+def handle_get(session: Session, constellation_id: int) -> orm_classes.Constellations:
     """Handle the GET request."""
-    return {
-        "input": constellation_id,
-        "message": "Constellation successfully retrieved."
-    }
+    return crud_and_listing.retrieve(orm_classes.Constellations, session, constellation_id)
 
 
-def handle_put(constellation_id: int) -> dict[str, str | int]:
+def handle_put(session: Session, data: c.ConstellationsForUpdate,
+               constellation_id: int) -> orm_classes.Constellations:
     """Handle the PUT request."""
-    return {
-        "input": constellation_id,
-        "message": "Constellation successfully updated."
-    }
+    return crud_and_listing.update(orm_classes.Constellations, session, data, constellation_id)
 
 
-def handle_delete(constellation_id: int) -> None:
+def handle_delete(session: Session, constellation_id: int) -> None:
     """Handle the DELETE request."""
-    return None
+    crud_and_listing.delete(orm_classes.Constellations, session, constellation_id)
 
 
-def handle_list() -> dict[str, str]:
+def handle_list(session: Session) -> list[orm_classes.Constellations]:
     """Handle the GET request."""
-    return {
-        "input": "ALL",
-        "message": "Constellations successfully retrieved."
-    }
+    return crud_and_listing.listing(orm_classes.Constellations, session)

@@ -1,8 +1,11 @@
 """This module defines the API router to handle requests to /users."""
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
+from sqlmodel import Session
 
+from app.dependencies import database
 from app.controllers import users
-
+from app.models import orm_classes
+from app.schemas import users as u
 
 router = APIRouter(
     prefix="/users",
@@ -10,31 +13,43 @@ router = APIRouter(
 )
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def register_user() -> dict[str, str]:
-    """Handle POST method."""
-    return users.handle_post()
+@router.get("/", status_code=status.HTTP_200_OK,
+            response_model=list[u.UsersShortInfo])
+async def list_users(
+        session: Session = Depends(database.get_session)) -> list[orm_classes.Users]:
+    """The return is actually a list of the models but is converted to the desired schema."""
+    return users.handle_list(session)
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
-async def list_users() -> dict[str, str]:
-    """Handle GET method."""
-    return users.handle_list()
+@router.post("/", status_code=status.HTTP_201_CREATED,
+             response_model=u.UsersLongInfo)
+async def register_user(data: u.UsersForCreate,
+                        session: Session = Depends(database.get_session)
+                        ) -> orm_classes.Users:
+    """The return is actually the model but is converted to the desired schema."""
+    return users.handle_post(session, data)
 
 
-@router.get("/{user_id}", status_code=status.HTTP_200_OK)
-async def get_user(user_id: int) -> dict[str, str | int]:
-    """Handle GET method."""
-    return users.handle_get(user_id)
+@router.get("/{user_id}", status_code=status.HTTP_200_OK,
+            response_model=u.UsersLongInfo)
+async def get_user(user_id: int,
+                   session: Session = Depends(database.get_session)
+                   ) -> orm_classes.Users:
+    """The return is actually the model but is converted to the desired schema."""
+    return users.handle_get(session, user_id)
 
 
-@router.put("/{user_id}", status_code=status.HTTP_202_ACCEPTED)
-async def update_user(user_id: int) -> dict[str, str | int]:
-    """Handle PUT method."""
-    return users.handle_put(user_id)
+@router.put("/{user_id}", status_code=status.HTTP_202_ACCEPTED,
+            response_model=u.UsersLongInfo)
+async def update_user(user_id: int, data: u.UsersForUpdate,
+                      session: Session = Depends(database.get_session)
+                      ) -> orm_classes.Users:
+    """The return is actually the model but is converted to the desired schema."""
+    return users.handle_put(session, data, user_id)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: str) -> None:
+async def delete_user(user_id: int,
+                      session: Session = Depends(database.get_session)) -> None:
     """Handle DELETE method."""
-    return users.handle_delete(user_id)
+    return users.handle_delete(session, user_id)

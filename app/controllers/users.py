@@ -1,37 +1,31 @@
 """This module defines the functions called when the *_user* routes are invoked."""
+from sqlmodel import Session
+
+from app.models import orm_classes, crud_and_listing
+from app.schemas import users as u
 
 
-def handle_post() -> dict[str, str]:
+def handle_post(session: Session, data: u.UsersForCreate) -> orm_classes.Users:
     """Handle the POST request."""
-    return {
-        "message": "User successfully registered."
-    }
+    return crud_and_listing.create(orm_classes.Users, session, data)
 
 
-def handle_get(user_id: int) -> dict[str, str | int]:
+def handle_get(session: Session, user_id: int) -> orm_classes.Users:
     """Handle the GET request."""
-    return {
-        "input": user_id,
-        "message": "User successfully retrieved."
-    }
+    return crud_and_listing.retrieve(orm_classes.Users, session, user_id)
 
 
-def handle_put(user_id: int) -> dict[str, str | int]:
+def handle_put(session: Session, data: u.UsersForUpdate,
+               user_id: int) -> orm_classes.Users:
     """Handle the PUT request."""
-    return {
-        "input": user_id,
-        "message": "User successfully updated."
-    }
+    return crud_and_listing.update(orm_classes.Users, session, data, user_id)
 
 
-def handle_delete(user_id: int) -> None:
+def handle_delete(session: Session, user_id: int) -> None:
     """Handle the DELETE request."""
-    return None
+    crud_and_listing.delete(orm_classes.Users, session, user_id)
 
 
-def handle_list() -> dict[str, str]:
+def handle_list(session: Session) -> list[orm_classes.Users]:
     """Handle the GET request."""
-    return {
-        "input": "ALL",
-        "message": "Users successfully retrieved."
-    }
+    return crud_and_listing.listing(orm_classes.Users, session)

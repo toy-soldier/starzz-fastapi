@@ -35,7 +35,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"a\",\r\n    \"password\": \"b\"\r\n}",
+					"raw": "{\r\n    \"constellation_id\": null,\r\n    \"constellation_name\": \"C3PO\",\r\n    \"galaxy_id\": 54,\r\n    \"added_by\": 100,\r\n    \"verified_by\": 2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -65,7 +65,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/constellations/1",
+					"raw": "http://127.0.0.1:{{port}}/constellations/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -76,7 +76,7 @@
 					"port": "{{port}}",
 					"path": [
 						"constellations",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -87,8 +87,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"constellation_id\": null,\r\n    \"constellation_name\": \"C3POlicing\",\r\n    \"galaxy_id\": 54,\r\n    \"added_by\": 100,\r\n    \"verified_by\": 24\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/constellations/1",
+					"raw": "http://127.0.0.1:{{port}}/constellations/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -99,7 +108,7 @@
 					"port": "{{port}}",
 					"path": [
 						"constellations",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -111,7 +120,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/constellations/1",
+					"raw": "http://127.0.0.1:{{port}}/constellations/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -122,7 +131,7 @@
 					"port": "{{port}}",
 					"path": [
 						"constellations",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -157,7 +166,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"a\",\r\n    \"password\": \"b\"\r\n}",
+					"raw": "{\r\n    \"galaxy_id\": null,\r\n    \"galaxy_name\": \"GAL-9ad0t\",\r\n    \"galaxy_type\": \"Cluster\",\r\n\t\"distance_mly\": 4683,\r\n\t\"redshift\": 4,\r\n\t\"mass_solar\": 5429,\r\n\t\"diameter_ly\": 6445,\r\n    \"added_by\": 100,\r\n    \"verified_by\": 2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -187,7 +196,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/galaxies/1",
+					"raw": "http://127.0.0.1:{{port}}/galaxies/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -198,7 +207,7 @@
 					"port": "{{port}}",
 					"path": [
 						"galaxies",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -209,8 +218,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"galaxy_id\": null,\r\n    \"galaxy_name\": \"GAL-9ad0t\",\r\n    \"galaxy_type\": \"Spiral\",\r\n\t\"distance_mly\": 4683,\r\n\t\"redshift\": 4,\r\n\t\"mass_solar\": 5429,\r\n\t\"diameter_ly\": 6445,\r\n    \"added_by\": 100,\r\n    \"verified_by\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/galaxies/1",
+					"raw": "http://127.0.0.1:{{port}}/galaxies/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -221,7 +239,7 @@
 					"port": "{{port}}",
 					"path": [
 						"galaxies",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -233,7 +251,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/galaxies/1",
+					"raw": "http://127.0.0.1:{{port}}/galaxies/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -244,7 +262,7 @@
 					"port": "{{port}}",
 					"path": [
 						"galaxies",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -279,7 +297,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"a\",\r\n    \"password\": \"b\"\r\n}",
+					"raw": "{\r\n\t\"star_id\": null,\r\n\t\"star_name\": \"S-954eW\",\r\n\t\"star_type\": \"Pulsar\",\r\n\t\"constellation_id\": 1,\r\n\t\"right_ascension\": 45,\r\n\t\"declination\": -67,\r\n\t\"apparent_magnitude\": 1000,\r\n\t\"spectral_type\": \"D\",\r\n\t\"added_by\": 16,\r\n\t\"verified_by\": 352\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -309,7 +327,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/stars/1",
+					"raw": "http://127.0.0.1:{{port}}/stars/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -320,7 +338,7 @@
 					"port": "{{port}}",
 					"path": [
 						"stars",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -331,8 +349,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"star_id\": null,\r\n\t\"star_name\": \"S-954eW\",\r\n\t\"star_type\": \"Quasar\",\r\n\t\"constellation_id\": 1,\r\n\t\"right_ascension\": 45,\r\n\t\"declination\": -67,\r\n\t\"apparent_magnitude\": 1000,\r\n\t\"spectral_type\": \"D\",\r\n\t\"added_by\": 16,\r\n\t\"verified_by\": 52\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/stars/1",
+					"raw": "http://127.0.0.1:{{port}}/stars/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -343,7 +370,7 @@
 					"port": "{{port}}",
 					"path": [
 						"stars",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -355,7 +382,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/stars/1",
+					"raw": "http://127.0.0.1:{{port}}/stars/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -366,7 +393,7 @@
 					"port": "{{port}}",
 					"path": [
 						"stars",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -401,7 +428,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"a\",\r\n    \"password\": \"b\"\r\n}",
+					"raw": "{\r\n    \"user_id\": null,\r\n    \"username\": \"stark29128\",\r\n    \"email\": \"eliot.balducci@aol.com\",\r\n    \"password\": \"string\",\r\n    \"first_name\": \"Bruce\",\r\n    \"last_name\": \"Stark\",\r\n    \"date_of_birth\": \"1993-08-24\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -431,7 +458,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/users/1",
+					"raw": "http://127.0.0.1:{{port}}/users/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -442,7 +469,7 @@
 					"port": "{{port}}",
 					"path": [
 						"users",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -453,8 +480,17 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": null,\r\n    \"username\": \"stark29128\",\r\n    \"email\": \"eliot.balducci@aol.com\",\r\n    \"password\": \"secret\",\r\n    \"first_name\": \"Stephen\",\r\n    \"last_name\": \"Stark\",\r\n    \"date_of_birth\": \"1993-08-24\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/users/1",
+					"raw": "http://127.0.0.1:{{port}}/users/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -465,7 +501,7 @@
 					"port": "{{port}}",
 					"path": [
 						"users",
-						"1"
+						"101"
 					]
 				}
 			},
@@ -477,7 +513,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:{{port}}/users/1",
+					"raw": "http://127.0.0.1:{{port}}/users/101",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -488,7 +524,7 @@
 					"port": "{{port}}",
 					"path": [
 						"users",
-						"1"
+						"101"
 					]
 				}
 			},

@@ -1,37 +1,31 @@
 """This module defines the functions called when the *_star* routes are invoked."""
+from sqlmodel import Session
+
+from app.models import orm_classes, crud_and_listing
+from app.schemas import stars as s
 
 
-def handle_post() -> dict[str, str]:
+def handle_post(session: Session, data: s.StarsForCreate) -> orm_classes.Stars:
     """Handle the POST request."""
-    return {
-        "message": "Star successfully registered."
-    }
+    return crud_and_listing.create(orm_classes.Stars, session, data)
 
 
-def handle_get(star_id: int) -> dict[str, str | int]:
+def handle_get(session: Session, star_id: int) -> orm_classes.Stars:
     """Handle the GET request."""
-    return {
-        "input": star_id,
-        "message": "Star successfully retrieved."
-    }
+    return crud_and_listing.retrieve(orm_classes.Stars, session, star_id)
 
 
-def handle_put(star_id: int) -> dict[str, str | int]:
+def handle_put(session: Session, data: s.StarsForUpdate,
+               star_id: int) -> orm_classes.Stars:
     """Handle the PUT request."""
-    return {
-        "input": star_id,
-        "message": "Star successfully updated."
-    }
+    return crud_and_listing.update(orm_classes.Stars, session, data, star_id)
 
 
-def handle_delete(star_id: int) -> None:
+def handle_delete(session: Session, star_id: int) -> None:
     """Handle the DELETE request."""
-    return None
+    crud_and_listing.delete(orm_classes.Stars, session, star_id)
 
 
-def handle_list() -> dict[str, str]:
+def handle_list(session: Session) -> list[orm_classes.Stars]:
     """Handle the GET request."""
-    return {
-        "input": "ALL",
-        "message": "Stars successfully retrieved."
-    }
+    return crud_and_listing.listing(orm_classes.Stars, session)
