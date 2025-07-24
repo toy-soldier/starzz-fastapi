@@ -31,6 +31,9 @@ class UsersShortInfo(UsersBase):
     user_id: int
 
 
-class UsersLongInfo(UsersForCreate):
+class UsersLongInfo(UsersShortInfo):
     """Class to be used for displaying a User's complete info."""
-    user_id: int
+    email: str
+    first_name: str
+    last_name: str
+    date_of_birth: str

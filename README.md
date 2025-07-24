@@ -291,6 +291,63 @@ package.
 
 The other modules in the `routers` package are similar.
 
+
+#### Chapter 3: Setting up password hashing
+
+Python libraries added:
+
+    bcrypt
+    passlib
+
+For security, we need to save the hash of the users' passwords, not the actual passwords.  We
+use the `passlib` library for this.  We add a new module `hashing.py` to the `dependencies` package:
+
+    ...
+    pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    
+    
+    def bcrypt(password: str) -> str:
+        """Return a hash of the password."""
+        return pwd_ctx.hash(password)
+    
+    
+    def verify(hashed_password: str, plaintext_string: str) -> bool:
+        """Check whether the given plaintext string equals the hashed password."""
+        return pwd_ctx.verify(plaintext_string, hashed_password)
+
+This module is a helper module for password hashing and verification.
+
+In `users.py` of the `controllers` package, we modify the functions that register new users and 
+update existing users.  We first hash the password in the data received (if the password exists),
+before forwarding the data.  For example:
+
+    ...
+    def handle_post(session: Session, data: u.UsersForCreate) -> orm_classes.Users:
+        """Handle the POST request."""
+        encrypt_password(data)
+        return crud_and_listing.create(orm_classes.Users, session, data)
+    
+    
+    def encrypt_password(data: u.UsersForCreate | u.UsersForUpdate) -> None:
+        """Encrypt the password before writing it to the database."""
+        plaintext_password = getattr(data, "password")
+        if plaintext_password:
+            setattr(data, "password", hashing.bcrypt(plaintext_password))
+    ...
+
+In `users.py` of the `schemas` package, we modify the `UsersLongInfo` schema so that 
+the user's password will not be displayed when the user's information is retrieved:
+
+    ...
+    class UsersLongInfo(UsersShortInfo):
+        """Class to be used for displaying a User's complete info."""
+        email: str
+        first_name: str
+        last_name: str
+        date_of_birth: str
+    ...
+    
+
 ### References
 
 Please refer to the documentations for more information.
