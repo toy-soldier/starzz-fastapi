@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlmodel import Session
 
-from app.dependencies import database
+from app.dependencies import database, security
 from app.controllers import constellations
 from app.models import orm_classes
 from app.schemas import constellations as c
@@ -24,9 +24,11 @@ async def list_constellations(
 @router.post("/", status_code=status.HTTP_201_CREATED,
              response_model=c.ConstellationsLongInfo)
 async def register_constellation(data: c.ConstellationsForCreate,
-                                 session: Session = Depends(database.get_session)
+                                 session: Session = Depends(database.get_session),
+                                 current_user: str = Depends(security.get_current_user)
                                  ) -> orm_classes.Constellations:
     """The return is actually the model but is converted to the desired schema."""
+    data.added_by = int(current_user.split("id=")[1])
     return constellations.handle_post(session, data)
 
 
@@ -42,7 +44,8 @@ async def get_constellation(constellation_id: int,
 @router.put("/{constellation_id}", status_code=status.HTTP_202_ACCEPTED,
             response_model=c.ConstellationsLongInfo)
 async def update_constellation(constellation_id: int, data: c.ConstellationsForUpdate,
-                               session: Session = Depends(database.get_session)
+                               session: Session = Depends(database.get_session),
+                               _: str = Depends(security.get_current_user)
                                ) -> orm_classes.Constellations:
     """The return is actually the model but is converted to the desired schema."""
     return constellations.handle_put(session, data, constellation_id)
@@ -50,6 +53,8 @@ async def update_constellation(constellation_id: int, data: c.ConstellationsForU
 
 @router.delete("/{constellation_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_constellation(constellation_id: int,
-                               session: Session = Depends(database.get_session)) -> None:
+                               session: Session = Depends(database.get_session),
+                               _: str = Depends(security.get_current_user)
+                               ) -> None:
     """Handle DELETE method."""
     return constellations.handle_delete(session, constellation_id)

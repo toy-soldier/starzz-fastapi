@@ -346,7 +346,174 @@ the user's password will not be displayed when the user's information is retriev
         last_name: str
         date_of_birth: str
     ...
+
+#### Chapter 4: Setting up authorization using JWT
+
+Python libraries added:
+
+    python-multipart
+    pyjwt
+
+We use JWT (JSON Web Token) to protect our sensitive endpoints.  Every time we receive a request 
+for one of these endpoints, we inspect the request's headers to see whether it contains a JWT.  
+If it does, we authorize (i.e. allow) the request to access the endpoint; otherwise we block the 
+request and raise an error.
+
+The JWT encodes information about the requestor.  Therefore, to generate the JWT we need to know 
+the identity of a user.  We require a user to log in to the application.  Upon successful authentication
+(i.e. we know who the user is), we generate a JWT containing his identity.  The user then includes 
+the JWT in subsequent requests. For user identification, we can use OAuth2.  
+
+To summarize, in this application we use OAuth2 for authentication and JWT for authorization.
+
+We begin by modifying `main.py` to include a route for logging in:
+
+    ...
+    app.include_router(auth.router)
+    ...
+
+In `auth.py` of `routers` package, we call `handle_login()` in `auth.py` of the `controllers` package:
+
+    ...
+    @router.post("/")
+    async def login_to_get_access_token(
+            form_data: OAuth2PasswordRequestForm = Depends(),
+            session: Session = Depends(database.get_session)) -> a.Token:
+        """ Returns a JWT upon successful login. """
+        return auth.handle_login(form_data, session)
+
+We pass in the form where the user entered his username and password.  We also pass a 
+database session.
+
+In `auth.py` of the `controllers` package, we define this function:
+
+    ...
+    def handle_login(
+            form_data: OAuth2PasswordRequestForm, session: Session) -> dict[str, str]:
+        """Handle the login attempt; return a JWT if successful, otherwise raise an error."""
+        data = security.authenticate_user(
+            crud_and_listing.get_user_by_username(session, form_data.username), form_data.password)
+        if not data:
+            raise exceptions.CannotBeAuthenticatedError()
     
+        access_token = security.create_access_token(
+            data={"sub": f'{data["username"]}, id={data["user_id"]}'},
+            expiry_in_minutes=constants.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    
+        return {"access_token": access_token, "token_type": "bearer"}
+
+We try to authenticate the user.  We first retrieve the user with the given username.  To do this, 
+in `crud_and_listing.py` of the `models` package, we add a function to search users by username:
+
+    ...
+    def get_user_by_username(session: Session, username: str) -> Users:
+        """Get the user with the given username."""
+        return session.exec(select(Users).filter(Users.username == username)).first()
+
+After we get the correct user, we then validate whether the password is correct.  To do this, in 
+`security.py` of the `dependencies` package, we add this function:
+
+    ...
+    def authenticate_user(user: orm_classes.Users, plaintext_password: str) -> dict[str, str] | None:
+        """Return a dict of user_id and username if the user is authenticated, otherwise return None."""
+        if user and hashing.verify(user.password, plaintext_password):
+            return {"user_id": user.user_id, "username": user.username}
+        return None
+    ...
+
+This calls the `verify()` function in the `hashing.py` module (also in the `dependencies` package) 
+to check whether the given password matches the user's hashed password saved in the database.  If 
+so, we return the user's id and username.
+
+Going back to `handle_login()` in `auth.py` of the `controllers` package: when the authentication 
+is successful, we generate a JWT.  The user's id and username are encoded in this token.  To do this, in 
+`security.py` of the `dependencies` package, we add this function:
+
+    ...
+    def create_access_token(data: dict[str, str | datetime], expiry_in_minutes: int) -> str:
+        """Create a JWT access token"""
+        expiry = datetime.now(timezone.utc) + timedelta(minutes=expiry_in_minutes)
+        to_encode = data.copy()
+        to_encode.update({"exp": expiry})
+        encoded_jwt = jwt.encode(to_encode, constants.JWT_SECRET_KEY,
+                                 algorithm=constants.JWT_ALGORITHM)
+        return encoded_jwt
+    ...
+
+The user then includes the token in the header of the user's subsequent requests.
+
+<img src="assets/postman.jpg" width="500" height="200"/>
+
+Now that we are able to provide JWTs to users, we can implement protection of our endpoints.
+We add this function to `security.py` of the `dependencies` package:
+
+    ...
+    def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
+        """Extract the user's identity from the JWT."""
+        try:
+            payload = jwt.decode(token, constants.JWT_SECRET_KEY,
+                                 algorithms=[constants.JWT_ALGORITHM])
+            identity = payload.get("sub")
+            if not identity:
+                raise InvalidSubjectError
+        except (InvalidTokenError, InvalidSubjectError):
+            raise exceptions.UnauthorizedError()
+        return identity
+    ...
+
+This function depends on `oauth2_scheme()`, which we have defined at the top of `security.py`:
+
+    ...
+    oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth")
+    ...
+
+This object takes as argument, the url of the route for user login.  The object is also a Python
+callable, thus we are able to make it a dependency of our `get_current_user()` function.  When 
+the object is called, it extracts the token from the request's headers.  If it is successful, it 
+returns the token to the caller.
+
+We now make `get_current_user()` a dependency of our sensitive endpoints.  This function returns 
+the identity encoded in the token.  For endpoints where we don't need the identity (i.e. we only 
+need to protect the endpoint), we assign the function's return value to `_`.  Examples of these 
+can be found in `galaxies.py` of the `routers` package
+
+    ...
+    @router.put("/{galaxy_id}", status_code=status.HTTP_202_ACCEPTED,
+                response_model=g.GalaxiesLongInfo)
+    async def update_galaxy(galaxy_id: int, data: g.GalaxiesForUpdate,
+                            session: Session = Depends(database.get_session),
+                            _: str = Depends(security.get_current_user)
+                            ) -> orm_classes.Galaxies:
+        """The return is actually the model but is converted to the desired schema."""
+        return galaxies.handle_put(session, data, galaxy_id)
+    
+    
+    @router.delete("/{galaxy_id}", status_code=status.HTTP_204_NO_CONTENT)
+    async def delete_galaxy(galaxy_id: int,
+                            session: Session = Depends(database.get_session),
+                            _: str = Depends(security.get_current_user)
+                            ) -> None:
+        """Handle DELETE method."""
+        return galaxies.handle_delete(session, galaxy_id)
+
+However, if we need the identity, we assign the return value to `current_user`:
+
+    ...
+    @router.post("/", status_code=status.HTTP_201_CREATED,
+                 response_model=g.GalaxiesLongInfo)
+    async def register_galaxy(data: g.GalaxiesForCreate,
+                              session: Session = Depends(database.get_session),
+                              current_user: str = Depends(security.get_current_user)
+                              ) -> orm_classes.Galaxies:
+        """The return is actually the model but is converted to the desired schema."""
+        data.added_by = int(current_user.split("id=")[1])
+        return galaxies.handle_post(session, data)
+    ...
+
+In this function, we parse out the user's id from `current_user` and set it as the data's `added_by`.
+
+Similar changes were done in the rest of the modules of the `routers` package.
 
 ### References
 

@@ -60,3 +60,8 @@ def delete(class_: MODEL_CLASSES, session: Session, obj_id: int) -> None:
 def listing(class_: MODEL_CLASSES, session: Session) -> list[MODELS]:
     """The Listing operation."""
     return session.exec(select(class_)).all()
+
+
+def get_user_by_username(session: Session, username: str) -> Users:
+    """Get the user with the given username."""
+    return session.exec(select(Users).filter(Users.username == username)).first()

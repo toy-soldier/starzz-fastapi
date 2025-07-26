@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlmodel import Session
 
-from app.dependencies import database
+from app.dependencies import database, security
 from app.controllers import galaxies
 from app.models import orm_classes
 from app.schemas import galaxies as g
@@ -24,9 +24,11 @@ async def list_galaxies(
 @router.post("/", status_code=status.HTTP_201_CREATED,
              response_model=g.GalaxiesLongInfo)
 async def register_galaxy(data: g.GalaxiesForCreate,
-                          session: Session = Depends(database.get_session)
+                          session: Session = Depends(database.get_session),
+                          current_user: str = Depends(security.get_current_user)
                           ) -> orm_classes.Galaxies:
     """The return is actually the model but is converted to the desired schema."""
+    data.added_by = int(current_user.split("id=")[1])
     return galaxies.handle_post(session, data)
 
 
@@ -42,7 +44,8 @@ async def get_galaxy(galaxy_id: int,
 @router.put("/{galaxy_id}", status_code=status.HTTP_202_ACCEPTED,
             response_model=g.GalaxiesLongInfo)
 async def update_galaxy(galaxy_id: int, data: g.GalaxiesForUpdate,
-                        session: Session = Depends(database.get_session)
+                        session: Session = Depends(database.get_session),
+                        _: str = Depends(security.get_current_user)
                         ) -> orm_classes.Galaxies:
     """The return is actually the model but is converted to the desired schema."""
     return galaxies.handle_put(session, data, galaxy_id)
@@ -50,6 +53,8 @@ async def update_galaxy(galaxy_id: int, data: g.GalaxiesForUpdate,
 
 @router.delete("/{galaxy_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_galaxy(galaxy_id: int,
-                        session: Session = Depends(database.get_session)) -> None:
+                        session: Session = Depends(database.get_session),
+                        _: str = Depends(security.get_current_user)
+                        ) -> None:
     """Handle DELETE method."""
     return galaxies.handle_delete(session, galaxy_id)

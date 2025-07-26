@@ -2,10 +2,11 @@
 from fastapi import FastAPI
 import uvicorn
 
-from app.routers import constellations, galaxies, stars, users
+from app.routers import auth, constellations, galaxies, stars, users
 
 app = FastAPI()
 
+app.include_router(auth.router)
 app.include_router(constellations.router)
 app.include_router(galaxies.router)
 app.include_router(stars.router)
