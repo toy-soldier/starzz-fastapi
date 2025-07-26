@@ -56,6 +56,8 @@ define it as `AUTO_INCREMENT`.
 
 All code committed at each chapter is available with the commit message of the chapter name.
 
+<img src="assets/commits.jpg" width="300" height="300"/>
+
 #### Chapter 1: Setting up the routes
 
 Python libraries added:
@@ -514,6 +516,25 @@ However, if we need the identity, we assign the return value to `current_user`:
 In this function, we parse out the user's id from `current_user` and set it as the data's `added_by`.
 
 Similar changes were done in the rest of the modules of the `routers` package.
+
+##### Notes
+
+Some tutorials (including the tutorial from the official FastAPI docs) write functions with dependencies as
+
+    async def read_users(commons: Annotated[dict, Depends(common_parameters)]):
+
+with an import of `Annotated` from `typing`.  This is equivalent to
+
+    async def read_users(commons: dict = Depends(common_parameters)):
+
+without needing to import `Annotated` from `typing`.
+
+The second format is used here, purely as a matter of preference.
+
+Regarding function dependencies: in the previous code snippet, think of it as, `read_users()` 
+depends on the `commons` dictionary.  This dictionary is returned by the Python callable 
+`common_parameters()`, so `common_parameters()` must be called before executing `read_users()`.  
+
 
 ### References
 
